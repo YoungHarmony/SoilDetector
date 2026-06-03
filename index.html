@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soil Detector — Download</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0c0f;
+    --surface: #14141a;
+    --surface2: #1c1c24;
+    --accent: #6ee7b7;
+    --accent2: #38bdf8;
+    --text: #f0eff8;
+    --muted: #7c7b8e;
+    --border: rgba(255,255,255,0.07);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow blobs */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-1 { width: 600px; height: 600px; background: var(--accent); top: -200px; left: -150px; }
+  .blob-2 { width: 500px; height: 500px; background: var(--accent2); bottom: -100px; right: -100px; }
+
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 80px 24px 60px;
+  }
+
+  /* Badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--accent);
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .badge span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
+
+  /* App icon */
+  .icon-wrap {
+    width: 96px;
+    height: 96px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, var(--surface2), var(--surface));
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    font-size: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .icon-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(110,231,183,.12), rgba(56,189,248,.08));
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 8vw, 52px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+  h1 em {
+    font-style: normal;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    font-weight: 400;
+  }
+
+  /* Info card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .meta-item label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 4px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+  }
+  .meta-item span {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  /* Download button */
+  .btn-download {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 18px 32px;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: #0a1a14;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    box-shadow: 0 0 40px rgba(110,231,183,0.25);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .btn-download:hover { transform: translateY(-2px); box-shadow: 0 0 60px rgba(110,231,183,0.4); }
+  .btn-download:active { transform: translateY(0); opacity: 0.9; }
+  .btn-download svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+  /* Download hint */
+  .hint {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .hint a { color: var(--accent2); text-decoration: none; }
+  .hint a:hover { text-decoration: underline; }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 28px 0;
+  }
+
+  /* Install steps */
+  .steps-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .steps { display: flex; flex-direction: column; gap: 12px; }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .step-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-text { font-size: 14px; color: var(--muted); line-height: 1.6; }
+  .step-text strong { color: var(--text); font-weight: 500; }
+
+  /* Footer */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 0 24px 40px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* Entry animation */
+  main > * { animation: fadeUp .5s ease both; }
+  main > *:nth-child(1) { animation-delay: 0s; }
+  main > *:nth-child(2) { animation-delay: .05s; }
+  main > *:nth-child(3) { animation-delay: .1s; }
+  main > *:nth-child(4) { animation-delay: .15s; }
+  main > *:nth-child(5) { animation-delay: .2s; }
+  main > *:nth-child(6) { animation-delay: .25s; }
+  main > *:nth-child(7) { animation-delay: .3s; }
+  main > *:nth-child(8) { animation-delay: .35s; }
+  main > *:nth-child(9) { animation-delay: .4s; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<main>
+  <div class="badge"><span></span>Beta Release</div>
+
+  <div class="icon-wrap">
+    🌱
+  </div>
+
+  <h1>Soil <em>Detector</em></h1>
+  <p class="subtitle">Analyze soil quality instantly using your phone's camera. Get real-time nutrient readings, pH estimates, and actionable farming insights — no lab required.</p>
+
+  <div class="card">
+    <div class="meta-grid">
+      <div class="meta-item">
+        <label>Version</label>
+        <span>v3.0.4</span>
+      </div>
+      <div class="meta-item">
+        <label>File Size</label>
+        <span>~45 MB</span>
+      </div>
+      <div class="meta-item">
+        <label>Requires</label>
+        <span>Android 8.0+</span>
+      </div>
+      <div class="meta-item">
+        <label>Released</label>
+        <span>May 20, 2026</span>
+      </div>
+    </div>
+  </div>
+
+  <a class="btn-download" href="https://github.com/YoungHarmony/SoilDetector/releases/download/v3.0.4/SoilDetector_3.0.4_release_20260520_092940.apk" download>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="7 10 12 15 17 10"/>
+      <line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+    Download APK
+  </a>
+
+  <p class="hint">
+    Make sure your device allows installation from unknown sources before downloading.<br>
+    Questions? <a href="mailto:guanmingyuan008@126.com">Contact the developer</a>
+  </p>
+
+  <hr class="divider">
+
+  <p class="steps-title">How to Install</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text">Tap the button above to <strong>download the APK</strong> to your device</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text">Go to <strong>Settings → Security</strong> and enable <strong>Install unknown apps</strong></div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text">Open your file manager, locate the downloaded APK, and tap <strong>Install</strong></div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-text">Once installed, open the app and start detecting. New versions will be posted on this page</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  © 2026 YoungHarmony · For beta testing only
+</footer>
+
+</body>
+</html>
